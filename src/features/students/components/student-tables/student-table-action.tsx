@@ -6,7 +6,7 @@ import { DataTableSearch } from '@/components/ui/table/data-table-search';
 import {
   CATEGORY_OPTIONS,
   useProductTableFilters
-} from './use-product-table-filters';
+} from './use-student-table-filters';
 
 export default function ProductTableAction() {
   const {
@@ -26,13 +26,13 @@ export default function ProductTableAction() {
         setSearchQuery={setSearchQuery}
         setPage={setPage}
       />
-      <DataTableFilterBox
+      {/* <DataTableFilterBox
         filterKey='categories'
         title='Categories'
         options={CATEGORY_OPTIONS}
         setFilterValue={setCategoriesFilter}
         filterValue={categoriesFilter}
-      />
+      /> */}
       <DataTableResetFilter
         isFilterActive={isAnyFilterActive}
         onReset={resetFilters}

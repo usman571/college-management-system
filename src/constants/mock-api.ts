@@ -3,154 +3,189 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 import { faker } from '@faker-js/faker';
-import { matchSorter } from 'match-sorter'; // For filtering
+import { matchSorter } from 'match-sorter';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Define the shape of Product data
-export type Product = {
+// Define the shape of Student data
+export type Student = {
+  id: number;
+  roll_number: string;
   photo_url: string;
   name: string;
-  description: string;
-  created_at: string;
-  price: number;
-  id: number;
-  category: string;
-  updated_at: string;
+  father_name: string;
+  cnic: string;
+  address: string;
+  phone: string;
+  email: string;
+  department: string;
+  semester: number;
+  admission_date: string;
+  last_updated: string;
+  cgpa: number;
+  status: 'Active' | 'Graduated' | 'On Leave' | 'Suspended';
 };
 
-// Mock product data store
-export const fakeProducts = {
-  records: [] as Product[], // Holds the list of product objects
+// Mock student data store
+export const fakeStudents = {
+  records: [] as Student[],
 
   // Initialize with sample data
   initialize() {
-    const sampleProducts: Product[] = [];
-    function generateRandomProductData(id: number): Product {
-      const categories = [
-        'Electronics',
-        'Furniture',
-        'Clothing',
-        'Toys',
-        'Groceries',
-        'Books',
-        'Jewelry',
-        'Beauty Products'
+    const sampleStudents: Student[] = [];
+    function generateRandomStudentData(id: number): Student {
+      const departments = [
+        'Computer Science',
+        'Physics',
+        'Chemistry',
+        'Mathematics',
+        'English',
+        'Economics',
+        'Botany',
+        'Zoology'
       ];
+
+      const statuses: Array<Student['status']> = [
+        'Active',
+        'Graduated',
+        'On Leave',
+        'Suspended'
+      ];
+
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
 
       return {
         id,
-        name: faker.commerce.productName(),
-        description: faker.commerce.productDescription(),
-        created_at: faker.date
-          .between({ from: '2022-01-01', to: '2023-12-31' })
+        roll_number: `${faker.number.int({
+          min: 2020,
+          max: 2024
+        })}-${faker.number.int({ min: 1000, max: 9999 })}`,
+        name: `${firstName} ${lastName}`,
+        father_name: `${faker.person.firstName()} ${lastName}`,
+        cnic: faker.number
+          .int({ min: 1000000000000, max: 9999999999999 })
+          .toString(),
+        address: faker.location.streetAddress(true),
+        phone: faker.phone.number(),
+        email: faker.internet.email({ firstName, lastName }).toLowerCase(),
+        photo_url: `https://images.pexels.com/photos/4855451/pexels-photo-4855451.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1`,
+        department: faker.helpers.arrayElement(departments),
+        semester: faker.number.int({ min: 1, max: 8 }),
+        admission_date: faker.date
+          .between({
+            from: '2020-01-01',
+            to: '2024-12-31'
+          })
           .toISOString(),
-        price: parseFloat(faker.commerce.price({ min: 5, max: 500, dec: 2 })),
-        photo_url: `https://api.slingacademy.com/public/sample-products/${id}.png`,
-        category: faker.helpers.arrayElement(categories),
-        updated_at: faker.date.recent().toISOString()
+        last_updated: faker.date.recent().toISOString(),
+        cgpa: parseFloat(faker.number.float({ min: 2.0, max: 4.0 }).toFixed(2)),
+        status: faker.helpers.arrayElement(statuses)
       };
     }
 
-    // Generate remaining records
-    for (let i = 1; i <= 20; i++) {
-      sampleProducts.push(generateRandomProductData(i));
+    // Generate sample records
+    for (let i = 1; i <= 50; i++) {
+      sampleStudents.push(generateRandomStudentData(i));
     }
 
-    this.records = sampleProducts;
+    this.records = sampleStudents;
   },
 
-  // Get all products with optional category filtering and search
+  // Get all students with optional department filtering and search
   async getAll({
-    categories = [],
-    search
+    departments = [],
+    search,
+    status
   }: {
-    categories?: string[];
+    departments?: string[];
     search?: string;
+    status?: Student['status'];
   }) {
-    let products = [...this.records];
+    let students = [...this.records];
 
-    // Filter products based on selected categories
-    if (categories.length > 0) {
-      products = products.filter((product) =>
-        categories.includes(product.category)
+    // Filter students based on selected departments
+    if (departments.length > 0) {
+      students = students.filter((student) =>
+        departments.includes(student.department)
       );
+    }
+
+    // Filter by status if provided
+    if (status) {
+      students = students.filter((student) => student.status === status);
     }
 
     // Search functionality across multiple fields
     if (search) {
-      products = matchSorter(products, search, {
-        keys: ['name', 'description', 'category']
+      students = matchSorter(students, search, {
+        keys: ['name', 'roll_number', 'father_name', 'department', 'email']
       });
     }
 
-    return products;
+    return students;
   },
 
-  // Get paginated results with optional category filtering and search
-  async getProducts({
+  // Get paginated results with optional department filtering and search
+  async getStudents({
     page = 1,
     limit = 10,
-    categories,
-    search
+    departments,
+    search,
+    status
   }: {
     page?: number;
     limit?: number;
-    categories?: string;
+    departments?: string;
     search?: string;
+    status?: Student['status'];
   }) {
     await delay(1000);
-    const categoriesArray = categories ? categories.split('.') : [];
-    const allProducts = await this.getAll({
-      categories: categoriesArray,
-      search
+    const departmentsArray = departments ? departments.split('.') : [];
+    const allStudents = await this.getAll({
+      departments: departmentsArray,
+      search,
+      status
     });
-    const totalProducts = allProducts.length;
+    const totalStudents = allStudents.length;
 
     // Pagination logic
     const offset = (page - 1) * limit;
-    const paginatedProducts = allProducts.slice(offset, offset + limit);
-
-    // Mock current time
-    const currentTime = new Date().toISOString();
+    const paginatedStudents = allStudents.slice(offset, offset + limit);
 
     // Return paginated response
     return {
       success: true,
-      time: currentTime,
-      message: 'Sample data for testing and learning purposes',
-      total_products: totalProducts,
+      time: new Date().toISOString(),
+      message: 'Student records retrieved successfully',
+      total_students: totalStudents,
       offset,
       limit,
-      products: paginatedProducts
+      students: paginatedStudents
     };
   },
 
-  // Get a specific product by its ID
-  async getProductById(id: number) {
-    await delay(1000); // Simulate a delay
+  // Get a specific student by ID
+  async getStudentById(id: number) {
+    await delay(1000);
 
-    // Find the product by its ID
-    const product = this.records.find((product) => product.id === id);
+    const student = this.records.find((student) => student.id === id);
 
-    if (!product) {
+    if (!student) {
       return {
         success: false,
-        message: `Product with ID ${id} not found`
+        message: `Student with ID ${id} not found`
       };
     }
 
-    // Mock current time
-    const currentTime = new Date().toISOString();
-
     return {
       success: true,
-      time: currentTime,
-      message: `Product with ID ${id} found`,
-      product
+      time: new Date().toISOString(),
+      message: `Student with ID ${id} found`,
+      student
     };
   }
 };
 
-// Initialize sample products
-fakeProducts.initialize();
+// Initialize sample students
+fakeStudents.initialize();
