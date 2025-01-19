@@ -19,7 +19,6 @@ const authConfig = {
       },
       async authorize(credentials, req) {
         if (process.env.NEXT_PUBLIC_FAKE_LOGIN === 'true') {
-          console.log('Returning user for Fake login');
           return { id: '1', name: 'Admin', email: 'dummy@admin.com' };
         }
         const user = {

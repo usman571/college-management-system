@@ -94,6 +94,7 @@ export default function StudentForm({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    //eslint-disable-next-line
     console.log(values);
   }
 
