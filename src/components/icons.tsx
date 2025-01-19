@@ -17,7 +17,6 @@ import {
   LogIn,
   LucideIcon,
   LucideProps,
-  LucideShoppingBag,
   Moon,
   MoreVertical,
   Pizza,
