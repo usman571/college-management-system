@@ -35,7 +35,6 @@ export function useProductTableFilters() {
   const resetFilters = useCallback(() => {
     setSearchQuery(null);
     setCategoriesFilter(null);
-
     setPage(1);
   }, [setSearchQuery, setCategoriesFilter, setPage]);
 

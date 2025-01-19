@@ -29,6 +29,7 @@ import {
   User,
   UserCircle2Icon,
   UserPen,
+  Users,
   UserX2Icon,
   X
 } from 'lucide-react';
@@ -40,7 +41,7 @@ export const Icons = {
   logo: Command,
   login: LogIn,
   close: X,
-  product: LucideShoppingBag,
+  student: Users,
   spinner: Loader2,
   kanban: CircuitBoardIcon,
   chevronLeft: ChevronLeft,
